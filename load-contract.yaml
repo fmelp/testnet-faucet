@@ -1,0 +1,7 @@
+codeFile: ../brackets-react/pact/brackets.pact
+data:
+  master-bracket-keyset: ["c1b24df55b9199fba6603c19707cd386e0995ec1e4b290985e2e01e6bdb9d4a0"]
+keyPairs:
+  - public: c1b24df55b9199fba6603c19707cd386e0995ec1e4b290985e2e01e6bdb9d4a0
+    secret: 37184015e291a7d7916cbaa05e79e62d8de98309b54e849c2cce676006069d35
+nonce: fetch-brackets
