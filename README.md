@@ -15,4 +15,4 @@ npm start
 
 note: this project does not require ```npm run start:pact``` as it initialized in the above github project
 
-seeding the chain is done in load-contract.yaml, where it assumes all the pact code is in a react project in a sibling directory to this one
+starting the local testnet is done in the [project linked above](https://github.com/fmelp/brackets-pact) so the contract references in load-contract.yaml, where it assumes all the pact code is in a react project in a sibling directory to this one
