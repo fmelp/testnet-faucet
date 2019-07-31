@@ -16,7 +16,9 @@ function App() {
         <p>Follow the instructions below to create an account and fund it with 12 coins</p>
         <CallPact/>
       </header>
-
+      <div style={{position: "absolute", top: 10, left: 10}}>
+            <img src={require('./kadena.png')} />
+          </div>
     </div>
   );
 }
