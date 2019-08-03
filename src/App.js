@@ -13,7 +13,6 @@ function App() {
         <p style={{fontSize: 45, color:"purple", fontWeight: "bold"}}>
           Welcome to the Kadena Testnet Faucet!
         </p>
-        <p>Follow the instructions below to create an account and fund it with 12 coins</p>
         <CallPact/>
       </header>
       <div style={{position: "absolute", top: 10, left: 10}}>

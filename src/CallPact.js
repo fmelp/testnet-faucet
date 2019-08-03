@@ -1,6 +1,8 @@
 import React from 'react';
 import Pact from "pact-lang-api";
 import Button from '@material-ui/core/Button';
+import { VpnKey, Lock } from '@material-ui/icons';
+import  './main.css';
 
 const API_HOST = "http://localhost:9001";
 
@@ -9,96 +11,80 @@ const API_HOST = "http://localhost:9001";
 class CallPact extends React.Component {
 
   state = {
-    buttonDisabled: false,
-    keyPair: {},
-    balance: 0
+    publicKey: "",
+    secretKey: ""
   }
 
   fundAccount = () => {
-    const keyPairObj = Pact.crypto.genKeyPair();
-    this.setState({ keyPair: keyPairObj });
+    let publicKey = this.state.publicKey.toString();
+    let secretKey = this.state.secretKey.toString().replace(publicKey, "");
+    console.log(publicKey);
+    console.log(secretKey)
     const cmdObj = {
-      pactCode: `(coin-faucet.request-coin ${JSON.stringify(keyPairObj.publicKey)} ${JSON.stringify(12)})`,
+      pactCode: `(coin-faucet.request-coin ${JSON.stringify(publicKey)} ${JSON.stringify(12)})`,
       keyPairs: {
-        publicKey: keyPairObj.publicKey,
-        secretKey: keyPairObj.secretKey
+        publicKey: publicKey,
+        secretKey: secretKey
       },
-      meta: Pact.lang.mkMeta(keyPairObj.publicKey, "", 0, 0),
-      envData: { [keyPairObj.publicKey] : [keyPairObj.secretKey] }
+      meta: Pact.lang.mkMeta(publicKey, "", 0, 0),
+      envData: { [publicKey] : [secretKey] }
     }
     console.log(cmdObj);
     Pact.fetch.send(cmdObj, API_HOST);
   }
 
-  getBalance = () => {
-    const cmdObj = {
-      pactCode: `(coin.account-balance ${JSON.stringify(this.state.keyPair.publicKey)})`,
-      keyPairs: {
-        publicKey: this.state.keyPair.publicKey,
-        secretKey: this.state.keyPair.secretKey
-      }
-    }
-    console.log(cmdObj);
-    Pact.fetch.local(cmdObj, API_HOST)
-    .then(res => {
-      console.log(res.data);
-      this.setState({ balance: res.data })
-    });
-  }
-
-  showAccountInfo = () => {
-    if (this.state.buttonDisabled){
-      return (
-        <div>
-          <p>Public Key:</p>
-          <p>{this.state.keyPair.publicKey}</p>
-          <Button variant="contained"
-            color="purple"
-            style={{ marginBottom: 10, marginTop: 10 }}
-            onClick={() => {
-              navigator.clipboard.writeText(this.state.keyPair.publicKey)
-            }}
-          >
-            Copy Public Key
-          </Button>
-          <p>Private Key:</p>
-          <p>********************************</p>
-          <Button variant="contained"
-            color="purple"
-            style={{ marginBottom: 10, marginTop: 10 }}
-            onClick={() => {
-              navigator.clipboard.writeText(this.state.keyPair.secretKey)
-            }}
-          >
-            Copy Private Key
-          </Button>
-          <p>Balance: {this.state.balance}</p>
-          <p style={{color:"red", fontWeight: "bold"}}>MAKE SURE TO SAFELY STORE YOUR KEYS!!</p>
-        </div>
-      );
-    }
-  }
 
   render() {
     return (
       <div>
+      <p>Enter your keys and press Fund Account to receive 12 coins</p>
+      <div className = "login-container">
+        <div className="login-input-container">
+          <div>
+              <VpnKey/>
+          </div>
+          <input
+            onChange={async (e) => {
+              // await this.setState({ publicKey: e.target.value });
+              // onKeysetChange(this.state.publicKey, this.state.secretKey)
+              this.setState({ publicKey: e.target.value });
+            }}
+            value={this.state.publicKey}
+            placeholder="public key"
+          />
+        </div>
+        <div className="login-input-container">
+          <div>
+              <Lock/>
+          </div>
+          <input
+            onChange={async (e) => {
+              // await this.setState({ publicKey: e.target.value });
+              // onKeysetChange(this.state.publicKey, this.state.secretKey)
+              this.setState({ secretKey: e.target.value });
+            }}
+            value={this.state.secretKey}
+            placeholder="private key"
+            type="password"
+          />
+        </div>
         <Button variant="contained"
-          color="purple"
-          disabled={this.state.buttonDisabled}
+          disabled={this.state.loginButtonDisabled}
+          color="primary"
+          className="custom-button"
+          variant="contained"
           style={{ marginBottom: 10, marginTop: 10 }}
           onClick={() => {
-            this.fundAccount()
-            this.setState({ buttonDisabled: true }, () => this.getBalance())
-
+            this.fundAccount();
           }}
         >
-          Create and Fund Account
+          Fund Account
         </Button>
-        {this.showAccountInfo()}
-      </div>
+        </div>
+        </div>
     );
   }
 
-}
 
+}
 export default CallPact;
