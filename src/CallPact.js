@@ -172,7 +172,7 @@ class CallPact extends React.Component {
               />
             </div>
               <Button variant="contained"
-                disabled={this.state.chainId===""}
+                disabled={this.state.chainId==="" || this.state.status !== "notStarted"}
                 color="primary"
                 className="custom-button"
                 variant="contained"
@@ -219,7 +219,7 @@ class CallPact extends React.Component {
               </div>
               <Button
                 variant="contained"
-                disabled={this.state.chainId===""}
+                disabled={this.state.chainId==="" || this.state.publicKey.length !== 64 || this.state.status !== "notStarted"}
                 className="custom-button"
                 style={{ marginBottom: 10, marginTop: 10 }}
                 onClick={() => {
