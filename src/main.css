@@ -56,3 +56,8 @@
     width: 250px;
     height: 60px;
 }
+
+.status-button{
+    background-color: black !important;
+    color: rgba(225,225,225) !important;
+}

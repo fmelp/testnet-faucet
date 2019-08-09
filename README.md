@@ -1,18 +1,10 @@
-## This project shares a local chain with another Pact dApp
-
-https://github.com/fmelp/brackets-pact
 
 ## Running steps:
 
-once you have the [project linked above](https://github.com/fmelp/brackets-pact) running please follow the next steps
+1. [Faucet contract](pact/heekyun-faucet1.pact) must be deployed to every chains in the testnet.
+2. Faucet account needs to be funded enough coins. (coin.transfer)
+3. Once Faucet is ready, start the web app by run following command, and open http://localhost:8000
 
-```
-npm run pact:seed
-```
 ```
 npm start
 ```
-
-note: this project does not require ```npm run start:pact``` as it initialized in the above github project
-
-starting the local testnet is done in the [project linked above](https://github.com/fmelp/brackets-pact) so the contract references in load-contract.yaml, where it assumes all the pact code is in a react project in a sibling directory to this one

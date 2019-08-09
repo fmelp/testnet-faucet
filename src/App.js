@@ -10,9 +10,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <p style={{fontSize: 45, color:"purple", fontWeight: "bold"}}>
-          Welcome to the Kadena Testnet Faucet!
-        </p>
+        <h1 style={{color:"purple"}}>Welcome to the Kadena Testnet Faucet!</h1>
         <CallPact/>
       </header>
       <div style={{position: "absolute", top: 10, left: 10}}>
