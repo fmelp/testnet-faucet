@@ -21,7 +21,7 @@
     font-size: 24px;
     width: 50%;
     margin: 0 auto;
-    border-radius: 20px;
+    border-radius: 5px;
     padding-left: 120px;
     padding-right: 120px;
     margin-bottom: 80px;
@@ -51,13 +51,14 @@
 }
 
 .custom-button{
-    background-color:#9F76CB !important;
+    background-color:#B54FA3 !important;
     color: rgba(225,225,225) !important;
-    width: 250px;
-    height: 60px;
+    width: 300px;
+    height: 70px;
+    font-size: 24px;
 }
 
 .status-button{
-    background-color: black !important;
+    background-color: #801868 !important;
     color: rgba(225,225,225) !important;
 }
