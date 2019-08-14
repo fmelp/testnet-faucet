@@ -63,10 +63,11 @@ class CallPact extends React.Component {
     else {
       this.setState({status: "started"})
       const reqKey = await Pact.fetch.send({
-        pactCode:`(heekyun-faucet1.create-and-request-coin ${JSON.stringify(this.state.accountName)} (read-keyset 'fund-keyset) 10.0)`,
+        pactCode:`(prodnet-faucet.create-and-request-coin ${JSON.stringify(this.state.accountName)} (read-keyset 'fund-keyset) 10.0)`,
+        //why does this work with a dummy key pair??? -> probably because we readkeyset...
         keyPairs: dumKeyPair,
         envData: {"fund-keyset": [this.state.publicKey]},
-        meta: Pact.lang.mkMeta("heekyun-faucet1",this.state.chainId,0.0000001,50)}, createAPIHost(hosts[this.state.host], this.state.chainId))
+        meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId,0.0000001,50)}, createAPIHost(hosts[this.state.host], this.state.chainId))
       if (reqKey) {
         this.setState({status: "waiting"})
         this.setState({reqKey: reqKey.requestKeys[0]})
@@ -88,11 +89,17 @@ class CallPact extends React.Component {
       }
       else {
         this.setState({status: "started"})
-        console.log(`(heekyun-faucet1.request-coin ${JSON.stringify(this.state.accountName)} 10.0)`)
         const reqKey = await Pact.fetch.send({
-          pactCode:`(heekyun-faucet1.request-coin ${JSON.stringify(this.state.accountName)} 10.0)`,
+          pactCode:`(prodnet-faucet.request-coin ${JSON.stringify(this.state.accountName)} 10.0)`,
+          // pactCode:`(coin.transfer ${JSON.stringify("heekyun-faucet2")} ${JSON.stringify(this.state.accountName)} 10.0)`,
+          //heekyun-key that deployed the contract
+          //without it we got keyset failure error
+          // keyPairs: {
+          //   publicKey: "ee5cf08887dd957422a6d2061a37d9573afe8b9524fcfc4f1495c606abe45b5a",
+          //   secretKey: "9ed66402c9e2a01e955c0417ec9a3976fd39d32d8f7579e3028e4e75b313f443",
+          // },
           keyPairs: dumKeyPair,
-          meta: Pact.lang.mkMeta("heekyun-faucet1",this.state.chainId, 0.0000001,50)
+          meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId, 0.0000001,50)
         }, createAPIHost(hosts[this.state.host], this.state.chainId))
 
         if (reqKey) {
@@ -119,7 +126,7 @@ class CallPact extends React.Component {
         this.setState({status: ""})}
       else if (res[0].result.status==="failure") {
         console.log(res);
-        this.setState({ modalMsg: `Sorry, we couln't fund your account`, modalHeader: 'TX FAILURE', modalError: `ERROR: ${res[0].result.error.message}` })
+        this.setState({ modalMsg: `Sorry, we couldn't fund your account`, modalHeader: 'TX FAILURE', modalError: `ERROR: ${res[0].result.error.message}` })
         this.handleOpen();
         // alert("Sorry, we couln't fund your account")
         this.setState({status: ""})
@@ -148,9 +155,9 @@ class CallPact extends React.Component {
 
   render() {
     return (
-    <div>
+    <div style={{ marginTop: 20 }}>
       <Grid textAlign='center'>
-        <Grid.Row textAlign='justified'>
+        <Grid.Row textAlign='justified' style={{ marginTop: 20 }}>
           <text
             style={{ color: "#373A3C",
                     fontSize: 50,

@@ -1,4 +1,4 @@
-(module heekyun-faucet1 FAUCET-GOVERNANCE
+(module prodnet-faucet FAUCET-GOVERNANCE
 
   "'coin-faucet' represents Kadena's Coin Faucet Contract."
 
@@ -26,7 +26,7 @@
   ; Constants
   ; --------------------------------------------------------------------------
 
-  (defconst FAUCET_ACCOUNT:string 'heekyun-faucet1)
+  (defconst FAUCET_ACCOUNT:string 'prodnet-faucet)
   (defconst MAX_COIN_PER_REQUEST:decimal 20.0)
 
   ; --------------------------------------------------------------------------
@@ -42,13 +42,22 @@
 
     (transfer FAUCET_ACCOUNT address amount)
 
-    (with-read history-table address {
-      "total-coins-earned":= total-coins-earned,
+    ;may need to change this to with default read....
+    ; (with-read history-table address {
+;   "total-coins-earned":= total-coins-earned,
+;   "total-coins-returned":= total-coins-returned }
+
+    (with-default-read history-table address
+      { "total-coins-earned": 0.0,
+      "total-coins-returned": 0.0 }
+      { "total-coins-earned":= total-coins-earned,
       "total-coins-returned":= total-coins-returned }
 
-        (update history-table address {
-           "total-coins-earned": (+ amount total-coins-earned),
-           "total-coins-returned": total-coins-returned })))
+        (let  (( total-coins (+ amount total-coins-earned)))
+
+        (write history-table address {
+          "total-coins-earned": total-coins,
+          "total-coins-returned": total-coins-returned }))))
 
 
   (defun create-and-request-coin:string (address:string address-guard:guard amount:decimal)
@@ -86,4 +95,4 @@
 )
 
 (create-table history-table)
-(create-account 'heekyun-faucet1 (faucet-guard))
+(create-account 'prodnet-faucet (faucet-guard))

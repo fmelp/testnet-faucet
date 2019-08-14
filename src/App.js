@@ -4,7 +4,7 @@ import './App.css';
 import CallPact from "./CallPact";
 import { Grid, Image } from "semantic-ui-react";
 
-import backgroundImage from './assets/background_logo_square.jpg';
+import backgroundImage from './assets/logo_blurred.jpg';
 
 function App() {
 
@@ -22,8 +22,10 @@ function App() {
   return (
     <div className="App">
       <Grid columns={2} verticalAlign='middle'>
-        <Grid.Column>
-          <Image src={backgroundImage} fluid={true} />
+        <Grid.Column style={{backgroundColor: "#B74FA4"}}>
+          <div className="App-header">
+            <Image src={backgroundImage} fluid={true} />
+          </div>
         </Grid.Column>
         <Grid.Column>
           <CallPact />
