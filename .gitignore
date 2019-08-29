@@ -8,9 +8,6 @@ public/bundle.js.map
 # NPM errors
 npm-debug.log
 
-#static
-static/*
-
 # OSX
 .DS_Store
 
