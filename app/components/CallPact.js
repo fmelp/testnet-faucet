@@ -58,12 +58,10 @@ class CallPact extends React.Component {
 
   fundCreateAccount = async () => {
     const accountCheck = await this.fetchAccountBalance(this.state.accountName, createAPIHost(hosts[this.state.host], this.state.chainId))
-    if (this.state.lastRequest !== null) {
-      const timePassed = (new Date() - this.state.lastRequest)/360000;
-      if (timePassed < 30) {
-          this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
-          this.handleOpen();
-      }
+    const timePassed = (new Date() - this.state.lastRequest)/60000;
+    if (this.state.lastRequest !== null && timePassed < 30) {
+      this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
+      this.handleOpen();
     }
     else if (accountCheck.status==="success") {
       this.setState({ modalMsg: `Account ${this.state.accountName} already exists on chain ${this.state.chainId}`, modalHeader: 'EXISTING ACCOUNT'})
@@ -78,6 +76,7 @@ class CallPact extends React.Component {
         meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId,0.0000001,50, 0, 28800)}, createAPIHost(hosts[this.state.host], this.state.chainId))
       if (reqKey) {
         this.saveFingerprint();
+        this.fetchFingerprint();
         this.setState({status: "waiting"})
         this.setState({reqKey: reqKey.requestKeys[0]})
       }
@@ -86,12 +85,10 @@ class CallPact extends React.Component {
 
   fundAccount = async () => {
       const accountCheck = await this.fetchAccountBalance(this.state.accountName, createAPIHost(hosts[this.state.host], this.state.chainId));
-      if (this.state.lastRequest !== null) {
-        const timePassed = (new Date() - this.state.lastRequest)/360000;
-        if (timePassed < 30) {
-            this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
-            this.handleOpen();
-        }
+      const timePassed = (new Date() - this.state.lastRequest)/60000;
+      if (this.state.lastRequest !== null && timePassed < 30) {
+          this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
+          this.handleOpen();
       }
       else if (accountCheck.status==="failure") {
         this.setState({ modalMsg: `Account ${this.state.accountName} does not exist on chain ${this.state.chainId}`, modalHeader: 'NO ACCOUNT'})
@@ -106,6 +103,7 @@ class CallPact extends React.Component {
         }, createAPIHost(hosts[this.state.host], this.state.chainId))
         if (reqKey) {
           this.saveFingerprint();
+          this.fetchFingerprint();
           this.setState({status: "waiting"})
           this.setState({reqKey: reqKey.requestKeys[0]})
         }
@@ -157,7 +155,7 @@ class CallPact extends React.Component {
     })
   }
 
-  componentDidMount(){
+  fetchFingerprint = () => {
     const options = {canvas: true}
     const self=this;
     //Get Fingerprint
@@ -175,6 +173,10 @@ class CallPact extends React.Component {
           else self.setState({lastRequest: null})
       })
     })
+  }
+
+  componentDidMount(){
+   this.fetchFingerprint();
   }
 
   render() {
