@@ -58,7 +58,7 @@ class CallPact extends React.Component {
 
   fundCreateAccount = async () => {
     const accountCheck = await this.fetchAccountBalance(this.state.accountName, createAPIHost(hosts[this.state.host], this.state.chainId))
-    if (this.state.lastRequest !== undefined) {
+    if (this.state.lastRequest !== null) {
       const timePassed = (new Date() - this.state.lastRequest)/360000;
       if (timePassed < 30) {
           this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
@@ -86,7 +86,7 @@ class CallPact extends React.Component {
 
   fundAccount = async () => {
       const accountCheck = await this.fetchAccountBalance(this.state.accountName, createAPIHost(hosts[this.state.host], this.state.chainId));
-      if (this.state.lastRequest !== undefined) {
+      if (this.state.lastRequest !== null) {
         const timePassed = (new Date() - this.state.lastRequest)/360000;
         if (timePassed < 30) {
             this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
