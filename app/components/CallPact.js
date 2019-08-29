@@ -1,15 +1,13 @@
 import React from 'react';
-import { Button, Grid, Dropdown, Input, Icon, Modal, Header } from 'semantic-ui-react';
-
+import { Button, Grid, Dropdown, Input, Icon, Modal, Header, Message } from 'semantic-ui-react';
+import axios from "axios"
 import Pact from "pact-lang-api";
-import  './main.css';
+import Fingerprint2 from "fingerprintjs2"
 
 const hosts = ["us1","us2","eu1","eu2","ap1","ap2"]
 const chainIds = ["0","1",'2',"3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19"]
 const createAPIHost = (network, chainId) => `https://${network}.testnet.chainweb.com/chainweb/0.0/testnet02/chain/${chainId}/pact`
 const dumKeyPair = Pact.crypto.genKeyPair();
-
-
 
 class CallPact extends React.Component {
 
@@ -24,7 +22,9 @@ class CallPact extends React.Component {
     modalOpen: false,
     modalMsg: "",
     modalHeader: "",
-    modalError: ""
+    modalError: "",
+    lastVisit: null,
+    fingerprint: null
   }
 
   onChangeAccountName = e => this.setState({accountName: e.target.value})
@@ -36,7 +36,6 @@ class CallPact extends React.Component {
   handleOpen = () => this.setState({ modalOpen: true })
 
   handleClose = () => this.setState({ modalOpen: false, modalError: "" })
-
 
   changeStatus = status => {
     this.setState({
@@ -50,25 +49,35 @@ class CallPact extends React.Component {
     })
   }
 
-  fundCreateAccount = async () => {
-    const accountCheck = await Pact.fetch.local({
-      pactCode: `(coin.account-balance ${JSON.stringify(this.state.accountName)})`,
+  fetchAccountBalance = (acctName, apiHost) => {
+    return Pact.fetch.local({
+      pactCode: `(coin.account-balance ${JSON.stringify(acctName)})`,
       keyPairs: dumKeyPair,
-    }, createAPIHost(hosts[this.state.host], this.state.chainId))
-    if (accountCheck.status==="success") {
+    }, apiHost)
+  }
+
+  fundCreateAccount = async () => {
+    const accountCheck = await this.fetchAccountBalance(this.state.accountName, createAPIHost(hosts[this.state.host], this.state.chainId))
+    // if (this.state.lastRequest !== undefined) {
+    //   const timePassed = (new Date() - this.state.lastRequest)/360000;
+    //   if (timePassed < 30) {
+    //       this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
+    //       this.handleOpen();
+    //   }
+    // }
+     if (accountCheck.status==="success") {
       this.setState({ modalMsg: `Account ${this.state.accountName} already exists on chain ${this.state.chainId}`, modalHeader: 'EXISTING ACCOUNT'})
       this.handleOpen();
-      // alert(`${this.state.accountName} ALREADY EXISTS ON CHAIN ${this.state.chainId}`)
     }
     else {
-      this.setState({status: "started"})
+      this.setState({status: "started"});
       const reqKey = await Pact.fetch.send({
-        pactCode:`(prodnet-faucet.create-and-request-coin ${JSON.stringify(this.state.accountName)} (read-keyset 'fund-keyset) 10.0)`,
-        //why does this work with a dummy key pair??? -> probably because we readkeyset...
+        pactCode:`(prodnet-faucet.create-and-request-coin ${JSON.stringify(this.state.accountName)} (read-keyset 'fund-keyset) 5.0)`,
         keyPairs: dumKeyPair,
         envData: {"fund-keyset": [this.state.publicKey]},
-        meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId,0.0000001,50)}, createAPIHost(hosts[this.state.host], this.state.chainId))
+        meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId,0.0000001,50, 0, 28800)}, createAPIHost(hosts[this.state.host], this.state.chainId))
       if (reqKey) {
+        this.saveFingerprint();
         this.setState({status: "waiting"})
         this.setState({reqKey: reqKey.requestKeys[0]})
       }
@@ -76,14 +85,15 @@ class CallPact extends React.Component {
   }
 
   fundAccount = async () => {
-      const accountCheck = await Pact.fetch.local({
-        pactCode: `(coin.account-balance ${JSON.stringify(this.state.accountName)})`,
-        keyPairs: dumKeyPair,
-      }, createAPIHost(hosts[this.state.host], this.state.chainId))
-      if (accountCheck.status==="failure") {
-        // alert(`ACCOUNT DOES NOT EXIST ON CHAIN ${this.state.chainId}`)
-        // this.createAlert('No Account', `ACCOUNT DOES NOT EXIST ON CHAIN ${this.state.chainId}`)
-        // this.handleOpen();
+      const accountCheck = await this.fetchAccountBalance(this.state.accountName, createAPIHost(hosts[this.state.host], this.state.chainId));
+      if (this.state.lastRequest !== undefined) {
+        const timePassed = (new Date() - this.state.lastRequest)/360000;
+        if (timePassed < 30) {
+            this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
+            this.handleOpen();
+        }
+      }
+      else if (accountCheck.status==="failure") {
         this.setState({ modalMsg: `Account ${this.state.accountName} does not exist on chain ${this.state.chainId}`, modalHeader: 'NO ACCOUNT'})
         this.handleOpen();
       }
@@ -91,23 +101,14 @@ class CallPact extends React.Component {
         this.setState({status: "started"})
         const reqKey = await Pact.fetch.send({
           pactCode:`(prodnet-faucet.request-coin ${JSON.stringify(this.state.accountName)} 10.0)`,
-          // pactCode:`(coin.transfer ${JSON.stringify("heekyun-faucet2")} ${JSON.stringify(this.state.accountName)} 10.0)`,
-          //heekyun-key that deployed the contract
-          //without it we got keyset failure error
-          // keyPairs: {
-          //   publicKey: "ee5cf08887dd957422a6d2061a37d9573afe8b9524fcfc4f1495c606abe45b5a",
-          //   secretKey: "9ed66402c9e2a01e955c0417ec9a3976fd39d32d8f7579e3028e4e75b313f443",
-          // },
           keyPairs: dumKeyPair,
-          meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId, 0.0000001,50)
+          meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId, 0.0000001,50,0,28800)
         }, createAPIHost(hosts[this.state.host], this.state.chainId))
-
         if (reqKey) {
-          console.log(reqKey);
+          this.saveFingerprint();
           this.setState({status: "waiting"})
           this.setState({reqKey: reqKey.requestKeys[0]})
         }
-
       }
     }
 
@@ -117,18 +118,14 @@ class CallPact extends React.Component {
       if (!res[0]) {
         this.setState({ modalMsg: "We're preparing the coin...", modalHeader: 'TX PENDING'})
         this.handleOpen();
-        // alert("We're preparing the coin...")
       }
       else if (res[0].result.status==="success") {
         this.setState({ modalMsg: `10 coins are funded to ${this.state.accountName}!`, modalHeader: 'TX SUCCESS'})
         this.handleOpen();
-        // alert(`10 coins are funded to ${this.state.accountName}!`)
         this.setState({status: ""})}
       else if (res[0].result.status==="failure") {
-        console.log(res);
         this.setState({ modalMsg: `Sorry, we couldn't fund your account`, modalHeader: 'TX FAILURE', modalError: `ERROR: ${res[0].result.error.message}` })
         this.handleOpen();
-        // alert("Sorry, we couln't fund your account")
         this.setState({status: ""})
       }
     })
@@ -143,18 +140,45 @@ class CallPact extends React.Component {
       if (res.status==="failure") {
         this.setState({ modalMsg: `Account ${this.state.accountName} does not exist on chain ${this.state.chainId}`, modalHeader: 'NO ACCOUNT'})
         this.handleOpen();
-        // alert(`ACCOUNT DOES NOT EXIST ON CHAIN ${this.state.chainId}`)
       }
       else{
         this.setState({ modalMsg: `${this.state.accountName} has ${res.data} Faucet Coins on chain ${this.state.chainId}`, modalHeader: 'USER EXISTS'})
         this.handleOpen();
-        // alert (`${this.state.accountName} has ${res.data} Faucet Coins On  chain ${this.state.chainId}`)
       }
     })
   }
 
+  saveFingerprint = () => {
+    const options = {canvas: true}
+    Fingerprint2.get( options, function (components) {
+        var values = components.map(function (component) { return component.value })
+        const murmur = Fingerprint2.x64hash128(values.join(''), 31)
+        axios.post('/api/fingerprint', {fingerprint: murmur, date: new Date().toISOString()})
+    })
+  }
+
+  componentDidMount(){
+    const options = {canvas: true}
+    const self=this;
+    //Get Fingerprint
+    Fingerprint2.get( options, function (components) {
+      var values = components.map(function (component) { return component.value })
+      const murmur = Fingerprint2.x64hash128(values.join(''), 31)
+      self.setState({fingerprint: murmur});
+      //Get last Request Date
+      axios.get(`/api/fingerprint/${murmur}`)
+        .then(res => {
+          return res.data
+        })
+        .then(data => {
+          if (data.date) self.setState({lastRequest: new Date(data.date)})
+          else self.setState({lastRequest: null})
+      })
+    })
+  }
+
   render() {
-    return (
+   return (
     <div style={{ marginTop: 20 }}>
       <Grid textAlign='center'>
         <Grid.Row textAlign='justified' style={{ marginTop: 20 }}>
@@ -324,21 +348,24 @@ class CallPact extends React.Component {
          {this.state.status==="notStarted"
            ? ""
            : this.state.status==="started"
-             ? <p>Waiting for your request key</p>
+             ?
+             <Message style={{overflow: "auto", width: "300px"}}>
+               <Message.Header>Waiting for Request Key</Message.Header>
+             </Message>
              : <div style={{ marginTop: 10}}>
 
-                  <Grid.Row>
-                     <text style={{fontSize: 20, fontFamily: 'Roboto', color: 'black'}}>Your Request Key is:</text>
-                  </Grid.Row>
-                  <Grid.Row style={{ marginBottom: 20 }}>
-                     <text style={{fontSize: 15, fontFamily: 'Roboto', color: 'black'}}>{this.state.reqKey}</text>
-                  </Grid.Row>
 
-                 <Button
-                   className="status-button"
-                   onClick={() => this.checkSuccess(this.state.reqKey)}>
-                  <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Check Request Status</text>
-                 </Button>
+                  <Message style={{overflow: "auto", width: "300px"}}>
+                    <Message.Header>Your Request Key</Message.Header>
+                    <p style={{fontSize: "13px"}}>
+                      {this.state.reqKey}
+                    </p>
+                  </Message>
+                  <Button
+                    className="status-button"
+                    onClick={() => this.checkSuccess(this.state.reqKey)}>
+                   <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Check Request Status</text>
+                  </Button>
                </div>
            }
         </div>

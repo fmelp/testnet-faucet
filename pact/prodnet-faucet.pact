@@ -65,7 +65,7 @@
     \ account to the requester account at ADDRESS. Inserts or updates the         \
     \ transaction of the account at ADDRESS in history-table. Limits the number   \
     \ of coin requests by time, WAIT_TIME_PER_REQUEST "
-    @model [(property (<= amount 20.0))]
+    @model [(property (<= amount MAX_COIN_PER_REQUEST))]
 
     (enforce (<= amount MAX_COIN_PER_REQUEST)
       "Has reached maximum coin amount per request")
