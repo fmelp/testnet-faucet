@@ -58,14 +58,14 @@ class CallPact extends React.Component {
 
   fundCreateAccount = async () => {
     const accountCheck = await this.fetchAccountBalance(this.state.accountName, createAPIHost(hosts[this.state.host], this.state.chainId))
-    // if (this.state.lastRequest !== undefined) {
-    //   const timePassed = (new Date() - this.state.lastRequest)/360000;
-    //   if (timePassed < 30) {
-    //       this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
-    //       this.handleOpen();
-    //   }
-    // }
-     if (accountCheck.status==="success") {
+    if (this.state.lastRequest !== undefined) {
+      const timePassed = (new Date() - this.state.lastRequest)/360000;
+      if (timePassed < 30) {
+          this.setState({ modalMsg: `You've received coin ${Math.round(timePassed)} minutes ago. Try again in ${Math.round(30-timePassed)} minutes`, modalHeader: 'WAIT'})
+          this.handleOpen();
+      }
+    }
+    else if (accountCheck.status==="success") {
       this.setState({ modalMsg: `Account ${this.state.accountName} already exists on chain ${this.state.chainId}`, modalHeader: 'EXISTING ACCOUNT'})
       this.handleOpen();
     }
