@@ -1,4 +1,4 @@
-(module prodnet-faucet FAUCET-GOVERNANCE
+(module coin-faucet FAUCET-GOVERNANCE
 
   "'coin-faucet' represents Kadena's Coin Faucet Contract."
 
@@ -26,7 +26,7 @@
   ; Constants
   ; --------------------------------------------------------------------------
 
-  (defconst FAUCET_ACCOUNT:string 'prodnet-faucet)
+  (defconst FAUCET_ACCOUNT:string 'coin-faucet)
   (defconst MAX_COIN_PER_REQUEST:decimal 20.0)
 
   ; --------------------------------------------------------------------------
@@ -90,4 +90,4 @@
 )
 
 (create-table history-table)
-(create-account 'prodnet-faucet (faucet-guard))
+(create-account 'coin-faucet (faucet-guard))
