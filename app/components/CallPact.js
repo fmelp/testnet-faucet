@@ -70,10 +70,10 @@ class CallPact extends React.Component {
     else {
       this.setState({status: "started"});
       const reqKey = await Pact.fetch.send({
-        pactCode:`(prodnet-faucet.create-and-request-coin ${JSON.stringify(this.state.accountName)} (read-keyset 'fund-keyset) 5.0)`,
+        pactCode:`(coin-faucet.create-and-request-coin ${JSON.stringify(this.state.accountName)} (read-keyset 'fund-keyset) 10.0)`,
         keyPairs: dumKeyPair,
         envData: {"fund-keyset": [this.state.publicKey]},
-        meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId,0.0000001,50, 0, 28800)}, createAPIHost(hosts[this.state.host], this.state.chainId))
+        meta: Pact.lang.mkMeta("faucet-operation",this.state.chainId,0.00000001,100,0,28800)}, createAPIHost(hosts[this.state.host], this.state.chainId))
       if (reqKey) {
         this.saveFingerprint();
         this.fetchFingerprint();
@@ -97,9 +97,9 @@ class CallPact extends React.Component {
       else {
         this.setState({status: "started"})
         const reqKey = await Pact.fetch.send({
-          pactCode:`(prodnet-faucet.request-coin ${JSON.stringify(this.state.accountName)} 10.0)`,
+          pactCode:`(coin-faucet.request-coin ${JSON.stringify(this.state.accountName)} 10.0)`,
           keyPairs: dumKeyPair,
-          meta: Pact.lang.mkMeta("prodnet-faucet",this.state.chainId, 0.0000001,50,0,28800)
+          meta: Pact.lang.mkMeta("faucet-operation",this.state.chainId, 0.00000001,100,0,28800)
         }, createAPIHost(hosts[this.state.host], this.state.chainId))
         if (reqKey) {
           this.saveFingerprint();
