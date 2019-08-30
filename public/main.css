@@ -50,15 +50,31 @@
     padding-left: 10px;
 }
 
-.custom-button{
+.welcome-button{
+    background-color:#B54FA3 !important;
+    color: white !important;
+}
+.welcome-button:hover{
+    background-color:#9c438c !important;
+    color: #fcedfa !important;
+}
+
+#arrow{
+  cursor: pointer;
+}
+
+#arrow:hover{
+  cursor: pointer;
+  color:#9c438c;
+}
+
+.fund-button{
     background-color:#B54FA3 !important;
     color: rgba(225,225,225) !important;
-    width: 300px;
-    height: 70px;
-    font-size: 24px;
 }
 
 .status-button{
     background-color: #801868 !important;
     color: rgba(225,225,225) !important;
+    width: 240px;
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid, Dropdown, Input, Icon, Modal, Header, Message } from 'semantic-ui-react';
+import { Button, Grid, Dropdown, Input, Icon, Form, Modal, Header, Message } from 'semantic-ui-react';
 import axios from "axios"
 import Pact from "pact-lang-api";
 import Fingerprint2 from "fingerprintjs2"
@@ -183,194 +183,135 @@ class CallPact extends React.Component {
    return (
     <div style={{ marginTop: 20 }}>
       <Grid textAlign='center'>
-        <Grid.Row textAlign='justified' style={{ marginTop: 20 }}>
-          <text
-            style={{ color: "#373A3C",
-                    fontSize: 50,
-                    fontWeight: "bold",
-                    fontFamily: 'Roboto',
-                    marginBottom: 10
-            }}
-          >
-            Welcome to the
-          </text>
-        </Grid.Row>
-        <Grid.Row textAlign='justified'>
-          <text
-            style={{ color: "#373A3C",
-                    fontSize: 50,
-                    fontWeight: "bold",
-                    fontFamily: 'Roboto',
-                    marginBottom: 10
-            }}
-          >
-            Kadena Testnet Faucet
-          </text>
-        </Grid.Row>
-        <Grid.Row textAlign='justified' style={{marginBottom: 0}}>
-          <text
-            style={{ color: "#373A3C",
-                    fontSize: 26,
-                    fontFamily: 'Roboto'
-            }}
-          >
-            Enter Your Account Name and Receive 10 coins!
-          </text>
-        </Grid.Row>
       {this.state.haveAccount===undefined
        ?
-        <div  className = "login-container">
+        <div  className = "login-conainer">
+          <h1 style={{fontSize: "4rem", marginBottom: "10px"}}> Welcome to<br/> Kadena Testnet Faucet</h1>
+          <h3>Enter Your Account Name and Receive 10 coins!</h3>
           <Button
-            className="custom-button"
-            // color={"#B54FA3"}
-            variant="contained"
-            style={{ marginBottom: 20, marginTop: 20 }}
+            className="welcome-button"
+            size='big'
             onClick={() => this.changeStatus(true)}
           >
-            <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Have an Account?</text>
+           Have an Account?
           </Button>
 
           <Button
-            // color={"#B54FA3"}
-            className="custom-button"
-            variant="contained"
-            style={{ marginTop: 20 }}
+            className="welcome-button"
+            size='big'
             onClick={() => this.changeStatus(false)}
           >
-           <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Don't Have an Account?</text>
+           Don't Have an Account?
           </Button>
           </div>
        :
-        <div className = "login-container">
-          <div>
-            <Grid.Row>
-              <Grid columns={3}>
-                <Grid.Column>
-                    <a onClick = {() => this.changeStatus(undefined)}>
-                      <Icon name='arrow left' style={{ color: "#B54FA3" }}/>
-                      <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "#B54FA3"}}>back</text>
-                    </a>
-                </Grid.Column>
-              </Grid>
-            </Grid.Row>
-            <Grid.Row style={{marginBottom: 5}}>
-              <text
-                style={{ fontSize: 14, fontWeight: "bold", fontFamily: 'Roboto', color: "black"}}
-              >
-                Chain ID
-              </text>
-            </Grid.Row>
-            <Grid.Row style={{ marginBottom: 0 }}>
-              <Dropdown
+
+        <div className = "login-contaner">
+         <h1 style={{fontSize: "4rem", marginBottom: "10px"}}> Kadena Testnet Faucet</h1>
+          <Form>
+          <h4 className="ui header">
+            <a id="arrow" onClick={() => this.changeStatus(undefined)} style={{color: "#B54FA3"}}>
+              <Icon name='arrow left'/>
+            </a>
+              Enter Your Account Name and Receive 10 coins!
+          </h4>
+            <Form.Field position="right" style={{width:"240px", margin: "0 auto"}} >
+             <label>Chain ID</label>
+              <Form.Select
                 placeholder={'Select Chain ID'}
                 search
                 selection
                 onChange={this.onChangeChainId}
                 options={chainIds.map(id => ({ key: id, text: id, value: id }))}
               >
-              </Dropdown>
-            </Grid.Row>
-          {this.state.haveAccount===true
-          ?
-          <div>
-
-
-              <Grid.Row style={{marginBottom: 5}}>
-                <text
-                  style={{ fontSize: 14, fontWeight: "bold", fontFamily: 'Roboto', color: "black"}}
-                >
-                  Account Name
-                </text>
-              </Grid.Row>
-              <Grid textAlign='center'>
-                <Grid.Row>
-                  <Input icon='user' iconPosition='left' placeholder='Account Name' onChange={this.onChangeAccountName} />
-                </Grid.Row>
-              </Grid>
-
-
+              </Form.Select>
+            </Form.Field>
+            {this.state.haveAccount===true
+            ?
+            <div>
+             <Form.Field style={{width:"240px", margin: "0 auto", marginTop: "10px"}}>
+              <label>Account Name</label>
+              <Form.Input icon='user' iconPosition='left' placeholder='Account Name' onChange={this.onChangeAccountName} />
+             </Form.Field>
               <Button
+                className="welcome-button"
                 disabled={this.state.chainId==="" || this.state.status !== "notStarted"}
-                className="custom-button"
-                style={{ marginBottom: 10, marginTop: 30 }}
+                style={{
+                  marginBottom: 10,
+                  marginTop: 30,
+                  width: "240px"
+               }}
                 onClick={() => {
                   this.fundAccount();
                 }}
               >
-                <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Fund Account</text>
-              </Button>
-              <Button variant="contained"
-                disabled={this.state.chainId===""}
-                className="custom-button"
-                variant="contained"
-                style={{ marginBottom: 10, marginTop: 10 }}
-                onClick={() => {
-                  this.accountBalance();
-                }}
-              >
-                <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Check Your Balance</text>
-              </Button>
-            </div>
+               Fund Account
+              </Button><br/>
+                <Button
+                  className="welcome-button"
+                  disabled={this.state.chainId===""}
+                  variant="contained"
+                  style={{
+                    marginBottom: 10,
+                    marginTop: 10,
+                    width: "240px"
+                  }}
+                  onClick={() => {
+                    this.accountBalance();
+                  }}
+                >
+                  Check Your Balance
+                </Button>
+              </div>
           :
             <div>
-                <Grid.Row style={{marginBottom: 5, marginTop: 10}}>
-                  <text
-                    style={{ fontSize: 14, fontWeight: "bold", fontFamily: 'Roboto', color: "black"}}
-                  >
-                    Account Name
-                  </text>
-                </Grid.Row>
-                <Grid.Row>
-                  <Input icon='user' iconPosition='left' placeholder='Account Name' onChange={this.onChangeAccountName} />
-                </Grid.Row>
-                <Grid.Row style={{marginBottom: 5, marginTop: 10}}>
-                  <text
-                    style={{ fontSize: 14, fontWeight: "bold", fontFamily: 'Roboto', color: "black"}}
-                  >
-                    Public Key
-                  </text>
-                </Grid.Row>
-                <Grid.Row>
-                  <Input icon='key' iconPosition='left' placeholder='Public Key' onChange={this.onChangePublicKey} />
-                </Grid.Row>
+              <Form.Field style={{width:"240px", margin: "0 auto", marginTop: "10px"}}>
+               <label>Account Name</label>
+               <Form.Input icon='user' iconPosition='left' placeholder='Account Name' onChange={this.onChangeAccountName} />
+              </Form.Field>
+              <Form.Field style={{width:"240px", margin: "0 auto", marginTop: "10px"}}>
+               <label>Public Key</label>
+               <Form.Input icon='key' iconPosition='left' placeholder='Public Key' onChange={this.onChangePublicKey} />
+              </Form.Field>
               <Button
-                variant="contained"
+                className="welcome-button"
                 disabled={this.state.chainId==="" || this.state.publicKey.length !== 64 || this.state.status !== "notStarted"}
-                className="custom-button"
-                style={{ marginBottom: 10, marginTop: 30 }}
+                style={{
+                  marginBottom: 10,
+                  marginTop: 30,
+                  width: "240px",
+                  }}
                 onClick={() => {
                   this.fundCreateAccount();
                 }}
               >
-                <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Create and Fund Account</text>
+               Create and Fund Account
               </Button>
-
           </div>
+
          }
+        </Form>
          {this.state.status==="notStarted"
            ? ""
            : this.state.status==="started"
              ?
-             <Message style={{overflow: "auto", width: "300px"}}>
+             <Message style={{overflow: "auto", width: "240px", margin: "0 auto" }}>
                <Message.Header>Waiting for Request Key</Message.Header>
              </Message>
              : <div style={{ marginTop: 10}}>
-
-
-                  <Message style={{overflow: "auto", width: "300px"}}>
-                    <Message.Header>Your Request Key</Message.Header>
-                    <p style={{fontSize: "13px"}}>
+                  <Message style={{overflow: "auto", width: "240px", margin: "0 auto"}}>
+                    <Message.Header >Your Request Key</Message.Header>
+                    <p style={{fontSize: "10px"}}>
                       {this.state.reqKey}
                     </p>
                   </Message>
                   <Button
                     className="status-button"
                     onClick={() => this.checkSuccess(this.state.reqKey)}>
-                   <text style={{ fontSize: 20, fontWeight: "bold", fontFamily: 'Roboto', color: "white"}}>Check Request Status</text>
+                   Check Request Status
                   </Button>
                </div>
            }
-        </div>
         </div>
       }
       </Grid>
