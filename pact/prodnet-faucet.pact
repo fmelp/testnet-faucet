@@ -2,8 +2,8 @@
 
   "'coin-faucet' represents Kadena's Coin Faucet Contract."
 
-  ;;Governance is TBD
-  (defcap FAUCET-GOVERNANCE () true)
+  (defcap FAUCET-GOVERNANCE ()
+    (enforce false "Enforce non-upgradeability except in the case of a hard fork"))
 
   ;; TODO - use hashed import
   (use coin)
@@ -41,11 +41,6 @@
       "Has reached maximum coin amount per request")
 
     (transfer FAUCET_ACCOUNT address amount)
-
-    ;may need to change this to with default read....
-    ; (with-read history-table address {
-;   "total-coins-earned":= total-coins-earned,
-;   "total-coins-returned":= total-coins-returned }
 
     (with-default-read history-table address
       { "total-coins-earned": 0.0,
